@@ -2,30 +2,143 @@
 
 A full-stack Todo task management web application built for assessment purposes.
 
-## Tech Stack
+The system consists of:
 
-- Backend: Laravel (PHP)
-- Frontend: React
-- Styling: Tailwind CSS
-- Database: PostgreSQL
-- Containerization: Docker and Docker Compose
+- **Backend API**: Laravel 11
+- **Frontend UI**: React + Vite
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL
+- **CI**: GitHub Actions
+- **Containerization**: Docker / Docker Compose
 
-## Project Structure
+## Project Overview
 
-- `backend/` — Laravel API
+This application allows users to:
+
+- create tasks with a title and description
+- view only the 5 most recent incomplete tasks
+- edit existing tasks
+- mark tasks as completed
+- delete tasks permanently
+
+The project is split into two main applications:
+
+- `backend/` — Laravel REST API
 - `frontend/` — React SPA
 
-## Development Plan
+## Prerequisites
+Before running the project locally, make sure you have:
 
-This repository will be developed in phases:
+- PHP 8.2+
+- Composer
+- Node.js 20+ (or newer)
+- npm
+- PostgreSQL
+- Git
 
-1. Initial repository setup
-2. Backend Laravel API setup
-3. Database design and migrations
-4. Backend CRUD implementation
-5. Backend testing
-6. Frontend SPA implementation
-7. Frontend testing
-8. API integration
-9. Docker setup
-10. Final documentation
+If Docker is used later, Docker Desktop and Docker Compose will also be required.
+
+## Clone the Repository
+
+```bash
+git clone <repository-url>
+cd todo-app
+```
+
+Replace `<repository-url>` with the actual repository URL.
+
+## Local Development Setup
+
+### Backend
+See `backend/README.md` for Laravel setup instructions.
+
+### Frontend
+See `frontend/README.md` for React + Vite setup instructions.
+
+## Running the Application Locally
+You will run the backend and frontend separately during development.
+
+### Backend
+
+```
+cd backend
+php artisan serve
+```
+
+### Frontend
+
+```
+cd frontend
+npm run dev
+```
+The frontend reads the backend API URL from the `VITE_API_URL` environment variable.
+
+## Testing
+
+### Backend tests
+
+```
+cd backend
+php artisan test
+```
+
+### Frontend tests
+
+```
+cd frontend
+npm run test
+```
+
+### Frontend build check
+
+```
+cd frontend
+npm run build
+```
+
+## API Overview
+The Laravel backend exposes RESTful JSON endpoints for task management.
+
+Main endpoints:
+
+- `GET /api/tasks`
+- `POST /api/tasks`
+- `PUT /api/tasks/{task}`
+- `PATCH /api/tasks/{task}/complete`
+- `DELETE /api/tasks/{task}`
+
+## Environment Variables
+
+### Backend
+Key variables are defined in `backend/.env.example`.
+
+### Frontend
+Key variables are defined in `frontend/.env.example`.
+
+Important frontend variable:
+
+```
+VITE_API_URL=http://127.0.0.1:8000
+```
+
+## GitHub Actions CI
+The repository uses GitHub Actions for automated checks on push and pull request events.
+
+Current checks include:
+
+- backend code style check
+- backend tests
+- frontend build check
+- frontend tests
+
+## Docker
+Docker support will be added in the Docker phase of the project.
+
+Once completed, the application will be runnable with Docker Compose using a single command.
+
+## Notes
+
+- The backend uses a singular table name: `task`
+- Completed tasks are removed from the visible task list
+- Deleted tasks are permanently removed from the database
+- The frontend is a single-page application (SPA)

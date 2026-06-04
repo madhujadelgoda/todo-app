@@ -1,16 +1,113 @@
-# React + Vite
+# Todo Frontend UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React + Vite frontend for the Todo Task Management App.
 
-Currently, two official plugins are available:
+It is a single-page application (SPA) that communicates with the Laravel backend API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Create task form
+- Edit task form
+- Task cards
+- Done action
+- Delete action
+- Displays only the 5 latest incomplete tasks
+- Toast messages
+- Loading and error states
+- Component tests with Vitest and React Testing Library
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Prerequisites
 
-## Expanding the ESLint configuration
+Make sure you have installed:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Node.js 20+
+- npm
+- Git
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Create the local environment file
+On Windows Command Prompt:
+
+```
+copy .env.example .env.local
+```
+On PowerShell:
+
+```
+Copy-Item .env.example .env.local
+```
+
+### 3. Configure the API URL
+Open `.env.local` and set the backend URL.
+
+Example:
+
+```
+VITE_API_URL=http://127.0.0.1:8000
+```
+
+## Running the Frontend
+Start the development server:
+
+```
+npm run dev
+```
+The frontend will usually be available at:
+
+```
+http://localhost:5173
+```
+
+## Build
+Create a production build:
+
+```
+npm run build
+```
+Preview the production build:
+
+```
+npm run preview
+```
+
+## Testing
+Run the frontend test suite:
+
+```
+npm run test
+```
+If Vitest opens watch mode and you want a single run, use:
+
+```
+npm run test -- --run
+```
+
+## Code Quality
+Run ESLint:
+
+```
+npm run lint
+```
+
+## Environment Variables
+The frontend uses Vite environment variables.
+
+Important variable:
+
+```
+VITE_API_URL=http://127.0.0.1:8000
+```
+
+## Notes
+
+- The frontend is styled with Tailwind CSS
+- The app reads task data from the Laravel API
+- Task list updates automatically after CRUD actions
+- Completed tasks are removed from the visible list
