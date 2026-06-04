@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 import Toast from './components/Toast'
+import ConfirmDialog from './components/ConfirmDialog'
 import { useTasks } from './hooks/useTasks'
 
 export default function App() {
@@ -18,6 +19,8 @@ export default function App() {
     removeTask,
     toast,
     dismissToast,
+    confirmDialog,
+    closeConfirmDialog,
   } = useTasks()
 
   const visibleTasks = useMemo(
@@ -25,9 +28,25 @@ export default function App() {
     [tasks],
   )
 
+  const totalIncompleteTasks = useMemo(
+    () => tasks.filter((task) => !task.is_completed).length,
+    [tasks],
+  )
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Toast toast={toast} onClose={dismissToast} />
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Task"
+        message="Are you sure you want to delete this task permanently? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDangerous
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={closeConfirmDialog}
+      />
 
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -39,7 +58,7 @@ export default function App() {
           </div>
 
           <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-            {visibleTasks.length} remaining
+            {totalIncompleteTasks} remaining
           </span>
         </div>
       </header>
@@ -66,7 +85,7 @@ export default function App() {
             </div>
 
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-              {visibleTasks.length} visible
+              {visibleTasks.length} of {totalIncompleteTasks}
             </span>
           </div>
 
