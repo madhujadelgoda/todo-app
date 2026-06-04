@@ -38,7 +38,7 @@ test('it returns validation errors when creating a task', function () {
         ->assertJsonValidationErrors(['title', 'description']);
 });
 
-test('it lists only the five most recent incomplete tasks', function () {
+test('it lists all incomplete tasks ordered by most recent first', function () {
     Task::factory()->create(['title' => 'Task 1', 'description' => 'Description 1']);
     Task::factory()->create(['title' => 'Task 2', 'description' => 'Description 2']);
     Task::factory()->create(['title' => 'Task 3', 'description' => 'Description 3']);
@@ -55,10 +55,10 @@ test('it lists only the five most recent incomplete tasks', function () {
     $response
         ->assertOk()
         ->assertJsonPath('message', 'Tasks loaded successfully')
-        ->assertJsonCount(5, 'data');
+        ->assertJsonCount(6, 'data');
 
     expect(collect($response->json('data'))->pluck('title')->all())
-        ->toBe(['Task 6', 'Task 5', 'Task 4', 'Task 3', 'Task 2']);
+        ->toBe(['Task 6', 'Task 5', 'Task 4', 'Task 3', 'Task 2', 'Task 1']);
 
     expect(collect($response->json('data'))->pluck('is_completed')->unique()->all())
         ->toBe([false]);

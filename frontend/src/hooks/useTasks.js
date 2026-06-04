@@ -34,6 +34,10 @@ export function useTasks() {
   const [error, setError] = useState('')
   const [editingTask, setEditingTask] = useState(null)
   const [toast, setToast] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    onConfirm: null,
+  })
 
   const showToast = useCallback((type, message) => {
     setToast({
@@ -100,8 +104,11 @@ export function useTasks() {
           const response = await createTask(payload)
 
           setTasks((current) =>
-            [response.data, ...current.filter((task) => task.id !== response.data.id)].slice(0, 5),
+            [response.data, ...current.filter((task) => task.id !== response.data.id)],
           )
+
+          // Fetch all tasks to get accurate total count
+          await loadTasks()
 
           showToast('success', response.message)
         }
@@ -130,6 +137,9 @@ export function useTasks() {
           setEditingTask(null)
         }
 
+        // Fetch the latest tasks to show the next incomplete task
+        await loadTasks()
+
         showToast('success', response.message)
         return { ok: true }
       } catch (error) {
@@ -140,39 +150,44 @@ export function useTasks() {
         setIsSubmitting(false)
       }
     },
-    [editingTask, showToast],
+    [editingTask, showToast, loadTasks],
   )
 
   const removeTask = useCallback(
     async (task) => {
-      const confirmed = window.confirm('Delete this task permanently?')
+      setConfirmDialog({
+        isOpen: true,
+        onConfirm: async () => {
+          setConfirmDialog({ isOpen: false, onConfirm: null })
+          setIsSubmitting(true)
 
-      if (!confirmed) {
-        return { ok: false, cancelled: true }
-      }
+          try {
+            const response = await deleteTask(task.id)
+            setTasks((current) => current.filter((item) => item.id !== task.id))
 
-      setIsSubmitting(true)
+            if (editingTask?.id === task.id) {
+              setEditingTask(null)
+            }
 
-      try {
-        const response = await deleteTask(task.id)
-        setTasks((current) => current.filter((item) => item.id !== task.id))
-
-        if (editingTask?.id === task.id) {
-          setEditingTask(null)
-        }
-
-        showToast('success', response.message)
-        return { ok: true }
-      } catch (error) {
-        const message = getErrorMessage(error)
-        showToast('error', message)
-        return { ok: false, message }
-      } finally {
-        setIsSubmitting(false)
-      }
+            await loadTasks()
+            showToast('success', response.message)
+            return { ok: true }
+          } catch (error) {
+            const message = getErrorMessage(error)
+            showToast('error', message)
+            return { ok: false, message }
+          } finally {
+            setIsSubmitting(false)
+          }
+        },
+      })
     },
-    [editingTask, showToast],
+    [editingTask, showToast, loadTasks],
   )
+
+  const closeConfirmDialog = useCallback(() => {
+    setConfirmDialog({ isOpen: false, onConfirm: null })
+  }, [])
 
   return {
     tasks,
@@ -187,5 +202,7 @@ export function useTasks() {
     removeTask,
     toast,
     dismissToast,
+    confirmDialog,
+    closeConfirmDialog,
   }
 }

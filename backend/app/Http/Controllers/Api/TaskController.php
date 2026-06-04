@@ -16,7 +16,6 @@ class TaskController extends Controller
         $tasks = Task::query()
             ->incomplete()
             ->latest()
-            ->limit(5)
             ->get();
 
         return response()->json([
