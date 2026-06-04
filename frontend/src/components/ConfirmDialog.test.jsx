@@ -13,7 +13,7 @@ test('does not render when not open', () => {
     />,
   )
 
-  expect(container.firstChild).toBeEmptyDOMElement()
+  expect(container.firstChild).toBeNull()
 })
 
 test('renders dialog when open', () => {
