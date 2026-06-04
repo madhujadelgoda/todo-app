@@ -19,7 +19,7 @@ It provides a RESTful JSON API for task management.
 
 Make sure you have installed:
 
-- PHP 8.2+
+- PHP 8.4+
 - Composer
 - PostgreSQL
 - Git

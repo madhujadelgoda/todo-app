@@ -29,7 +29,7 @@ The project is split into two main applications:
 ## Prerequisites
 Before running the project locally, make sure you have:
 
-- PHP 8.2+
+- PHP 8.4+
 - Composer
 - Node.js 20+ (or newer)
 - npm
@@ -132,9 +132,34 @@ Current checks include:
 - frontend tests
 
 ## Docker
-Docker support will be added in the Docker phase of the project.
+This project can be started with Docker Compose.
 
-Once completed, the application will be runnable with Docker Compose using a single command.
+### Start the full stack
+
+```bash
+docker compose up --build
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000
+- **Database**: localhost:5432
+
+### Run tests in Docker
+
+```bash
+docker compose exec api php artisan test
+```
+
+```bash
+docker compose exec frontend npm run test
+```
+
+### Stop the application
+
+```bash
+docker compose down
+```
 
 ## Notes
 
