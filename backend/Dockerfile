@@ -18,6 +18,9 @@ COPY . .
 
 RUN composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
 
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views && \
+    chmod -R 777 storage bootstrap/cache
+
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
