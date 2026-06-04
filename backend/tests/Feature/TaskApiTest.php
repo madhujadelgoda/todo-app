@@ -7,12 +7,15 @@ uses(RefreshDatabase::class);
 
 test('it creates a task', function () {
     $response = $this->postJson('/api/tasks', [
-        'title' => 'Buy books',
-        'description' => 'Buy books for the next school year',
+        'title' => '   **Buy books**   ',
+        'description' => '   Buy books for the next school year
+
+   ',
     ]);
 
     $response
         ->assertCreated()
+        ->assertJsonPath('message', 'Task added successfully')
         ->assertJsonPath('data.title', 'Buy books')
         ->assertJsonPath('data.description', 'Buy books for the next school year')
         ->assertJsonPath('data.is_completed', false);
@@ -22,6 +25,17 @@ test('it creates a task', function () {
         'description' => 'Buy books for the next school year',
         'is_completed' => false,
     ]);
+});
+
+test('it returns validation errors when creating a task', function () {
+    $response = $this->postJson('/api/tasks', [
+        'title' => '',
+        'description' => '',
+    ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['title', 'description']);
 });
 
 test('it lists only the five most recent incomplete tasks', function () {
@@ -38,7 +52,10 @@ test('it lists only the five most recent incomplete tasks', function () {
 
     $response = $this->getJson('/api/tasks');
 
-    $response->assertOk()->assertJsonCount(5, 'data');
+    $response
+        ->assertOk()
+        ->assertJsonPath('message', 'Tasks loaded successfully')
+        ->assertJsonCount(5, 'data');
 
     expect(collect($response->json('data'))->pluck('title')->all())
         ->toBe(['Task 6', 'Task 5', 'Task 4', 'Task 3', 'Task 2']);
@@ -60,6 +77,7 @@ test('it updates a task', function () {
 
     $response
         ->assertOk()
+        ->assertJsonPath('message', 'Task updated successfully')
         ->assertJsonPath('data.title', 'Updated title')
         ->assertJsonPath('data.description', 'Updated description');
 
@@ -68,6 +86,19 @@ test('it updates a task', function () {
         'title' => 'Updated title',
         'description' => 'Updated description',
     ]);
+});
+
+test('it returns validation errors when updating a task', function () {
+    $task = Task::factory()->create();
+
+    $response = $this->putJson("/api/tasks/{$task->id}", [
+        'title' => '',
+        'description' => '',
+    ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['title', 'description']);
 });
 
 test('it marks a task as completed', function () {
@@ -81,6 +112,7 @@ test('it marks a task as completed', function () {
 
     $response
         ->assertOk()
+        ->assertJsonPath('message', 'Task marked as completed successfully')
         ->assertJsonPath('data.is_completed', true);
 
     $this->assertDatabaseHas('task', [
@@ -95,6 +127,17 @@ test('it marks a task as completed', function () {
         ]);
 });
 
+test('it returns 404 when updating a missing task', function () {
+    $this->putJson('/api/tasks/999999', [
+        'title' => 'Missing',
+        'description' => 'Missing',
+    ])->assertNotFound();
+});
+
+test('it returns 404 when completing a missing task', function () {
+    $this->patchJson('/api/tasks/999999/complete')->assertNotFound();
+});
+
 test('it deletes a task permanently', function () {
     $task = Task::factory()->create([
         'title' => 'Task to delete',
@@ -103,20 +146,15 @@ test('it deletes a task permanently', function () {
 
     $response = $this->deleteJson("/api/tasks/{$task->id}");
 
-    $response->assertNoContent();
+    $response
+        ->assertOk()
+        ->assertJsonPath('message', 'Task deleted successfully');
 
     $this->assertDatabaseMissing('task', [
         'id' => $task->id,
     ]);
 });
 
-test('it returns validation errors when creating a task', function () {
-    $response = $this->postJson('/api/tasks', [
-        'title' => '',
-        'description' => '',
-    ]);
-
-    $response
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['title', 'description']);
+test('it returns 404 when deleting a missing task', function () {
+    $this->deleteJson('/api/tasks/999999')->assertNotFound();
 });
