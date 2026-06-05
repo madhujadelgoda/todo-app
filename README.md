@@ -16,7 +16,7 @@ The system consists of:
 This application allows users to:
 
 - create tasks with a title and description
-- view only the 5 most recent incomplete tasks
+- view incomplete tasks with pagination (latest tasks shown first)
 - edit existing tasks
 - mark tasks as completed
 - delete tasks permanently
@@ -46,6 +46,29 @@ cd todo-app
 ```
 
 Replace `<repository-url>` with the actual repository URL.
+
+## Environment Setup
+
+### Backend Configuration
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Create a `.env` file from the example:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Generate the application key:
+   ```bash
+   php artisan key:generate
+   ```
+
+For local development (non-Docker), update `DB_HOST` in `.env` to your local PostgreSQL host (typically `127.0.0.1`).
+
+For Docker, the `.env` file is automatically generated with Docker-friendly configuration.
 
 ## Local Development Setup
 
@@ -132,9 +155,11 @@ Current checks include:
 - frontend tests
 
 ## Docker
-This project can be started with Docker Compose.
+This project can be started with Docker Compose for complete application deployment.
 
-### Start the full stack
+### Single Command Startup
+
+Start the entire application stack (database, API, frontend) with a single command:
 
 ```bash
 docker compose up --build
@@ -145,17 +170,21 @@ The application will be available at:
 - **Backend API**: http://localhost:8000
 - **Database**: localhost:5432
 
-### Run tests in Docker
+> **Note on `.env` file**: The `.env` file is automatically generated from `.env.example` during the Docker build process. The `.env` file is not committed to the repository for security reasons. Docker is configured with secure, service-friendly defaults (e.g., `DB_HOST=db` for the database service name).
 
+### Run Tests in Docker
+
+Backend tests:
 ```bash
 docker compose exec api php artisan test
 ```
 
+Frontend tests:
 ```bash
 docker compose exec frontend npm run test
 ```
 
-### Stop the application
+### Stop the Application
 
 ```bash
 docker compose down
@@ -164,6 +193,8 @@ docker compose down
 ## Notes
 
 - The backend uses a singular table name: `task`
+- All incomplete tasks are fetched from the database; the frontend displays the latest 5 in a "Recent Tasks" section
 - Completed tasks are removed from the visible task list
 - Deleted tasks are permanently removed from the database
 - The frontend is a single-page application (SPA)
+- The `.env` file is required but intentionally excluded from version control for security
